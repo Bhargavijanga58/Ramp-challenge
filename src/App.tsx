@@ -7,12 +7,12 @@ import { usePaginatedTransactions } from "./hooks/usePaginatedTransactions"
 import { useTransactionsByEmployee } from "./hooks/useTransactionsByEmployee"
 import { EMPTY_EMPLOYEE } from "./utils/constants"
 import { Employee } from "./utils/types"
-
+import React from "react"
 export function App() {
   const { data: employees, ...employeeUtils } = useEmployees()
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
-  const [isLoading, setIsLoading] = useState(false)
+  
 
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
@@ -20,19 +20,23 @@ export function App() {
   )
 
   const loadAllTransactions = useCallback(async () => {
-    setIsLoading(true)
+
     transactionsByEmployeeUtils.invalidateData()
 
     await employeeUtils.fetchAll()
     await paginatedTransactionsUtils.fetchAll()
 
-    setIsLoading(false)
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
       paginatedTransactionsUtils.invalidateData()
-      await transactionsByEmployeeUtils.fetchById(employeeId)
+      // Bug 3 FIxed: Cannot select All Employees after selecting an employee
+      if (employeeId) {
+        await transactionsByEmployeeUtils.fetchById(employeeId)
+       
+      } await paginatedTransactionsUtils.fetchAll()
+      
     },
     [paginatedTransactionsUtils, transactionsByEmployeeUtils]
   )
@@ -51,7 +55,7 @@ export function App() {
         <hr className="RampBreak--l" />
 
         <InputSelect<Employee>
-          isLoading={isLoading}
+          // Bug 5 fixed: Employees filter not available during loading more data
           defaultValue={EMPTY_EMPLOYEE}
           items={employees === null ? [] : [EMPTY_EMPLOYEE, ...employees]}
           label="Filter by employee"
@@ -61,20 +65,19 @@ export function App() {
             label: `${item.firstName} ${item.lastName}`,
           })}
           onChange={async (newValue) => {
+
             if (newValue === null) {
               return
             }
-
             await loadTransactionsByEmployee(newValue.id)
           }}
         />
 
         <div className="RampBreak--l" />
-
         <div className="RampGrid">
+          {/* Bug 6 Fixed: View more button not working as expected */}
           <Transactions transactions={transactions} />
-
-          {transactions !== null && (
+          {transactions !== null && paginatedTransactions?.nextPage &&(
             <button
               className="RampButton"
               disabled={paginatedTransactionsUtils.loading}

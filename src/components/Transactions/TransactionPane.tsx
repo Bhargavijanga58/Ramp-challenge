@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { InputCheckbox } from "../InputCheckbox"
 import { TransactionPaneComponent } from "./types"
+import React from "react"
 
 export const TransactionPane: TransactionPaneComponent = ({
   transaction,
@@ -8,6 +9,7 @@ export const TransactionPane: TransactionPaneComponent = ({
   setTransactionApproval: consumerSetTransactionApproval,
 }) => {
   const [approved, setApproved] = useState(transaction.approved)
+
 
   return (
     <div className="RampPane">

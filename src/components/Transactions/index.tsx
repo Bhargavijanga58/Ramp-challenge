@@ -3,9 +3,9 @@ import { useCustomFetch } from "src/hooks/useCustomFetch"
 import { SetTransactionApprovalParams } from "src/utils/types"
 import { TransactionPane } from "./TransactionPane"
 import { SetTransactionApprovalFunction, TransactionsComponent } from "./types"
-
+import React from "react"
 export const Transactions: TransactionsComponent = ({ transactions }) => {
-  const { fetchWithoutCache, loading } = useCustomFetch()
+  const { fetchWithoutCache, loading, clearCacheByEndpoint } = useCustomFetch()
 
   const setTransactionApproval = useCallback<SetTransactionApprovalFunction>(
     async ({ transactionId, newValue }) => {
@@ -13,8 +13,10 @@ export const Transactions: TransactionsComponent = ({ transactions }) => {
         transactionId,
         value: newValue,
       })
+      // Bug 7 Fixed:Approving a transaction won't persist the new value
+      clearCacheByEndpoint(["paginatedTransactions", "transactionsByEmployee"])
     },
-    [fetchWithoutCache]
+    [fetchWithoutCache, clearCacheByEndpoint]
   )
 
   if (transactions === null) {

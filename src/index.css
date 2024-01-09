@@ -102,8 +102,11 @@ hr.RampBreak--l {
   box-shadow: rgb(0 0 0 / 10%) 0px 0px 1px, rgb(0 0 0 / 13%) 0px 4px 8px;
 }
 
+/* Bug 1 Fixed: Select dropdown doesn't scroll with rest of the page */
+
 .RampInputSelect--dropdown-container-opened {
   display: block;
+  position: absolute;
 }
 
 .RampInputSelect--dropdown-item {
@@ -148,6 +151,8 @@ hr.RampBreak--l {
   border-color: var(--color-constructive);
   background-color: var(--color-constructive);
 }
+
+
 
 .RampInputCheckbox--input {
   display: none;
